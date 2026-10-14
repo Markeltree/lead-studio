@@ -67,9 +67,9 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             <SubmitButton label="Sign in" pendingLabel="Signing in…" size="lg" className="w-full" icon={<ArrowRight className="order-last" />} />
           </form>
 
-          <p className="text-center text-xs text-muted-foreground">
+          {/* <p className="text-center text-xs text-muted-foreground">
             No account? Create one with <code className="rounded bg-muted px-1 py-0.5 font-mono">npm run create-user</code>
-          </p>
+          </p> */}
         </div>
       </section>
     </main>

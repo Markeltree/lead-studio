@@ -4,15 +4,16 @@ import { SESSION_COOKIE, verifySessionToken } from '@/lib/session';
 export async function middleware(request: NextRequest) {
   const user = await verifySessionToken(request.cookies.get(SESSION_COOKIE)?.value);
   const { pathname } = request.nextUrl;
-  const isPublic = pathname.startsWith('/login');
+  const isLogin = pathname.startsWith('/login');
+  const isLanding = pathname === '/';
 
-  if (!user && !isPublic) {
+  if (!user && !isLogin && !isLanding) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
-  if (user && isPublic) {
+  if (user && isLogin) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);
