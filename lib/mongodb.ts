@@ -22,7 +22,11 @@ function clientPromise(): Promise<MongoClient> {
   if (!globalForMongo._mongoClient) {
     const uri = process.env.MONGODB_URI;
     if (!uri) throw new Error('MONGODB_URI is not set.');
-    globalForMongo._mongoClient = new MongoClient(uri).connect();
+    globalForMongo._mongoClient = new MongoClient(uri).connect().catch((err) => {
+      // Don't cache a failed connection: let the next request try again.
+      globalForMongo._mongoClient = undefined;
+      throw err;
+    });
   }
   return globalForMongo._mongoClient;
 }
@@ -43,7 +47,10 @@ async function ensureIndexes(db: Db) {
 export async function getDb(): Promise<Db> {
   const client = await clientPromise();
   const db = client.db(process.env.MONGODB_DB || 'lead-studio');
-  globalForMongo._mongoIndexes ??= ensureIndexes(db);
+  globalForMongo._mongoIndexes ??= ensureIndexes(db).catch((err) => {
+    globalForMongo._mongoIndexes = undefined;
+    throw err;
+  });
   await globalForMongo._mongoIndexes;
   return db;
 }
